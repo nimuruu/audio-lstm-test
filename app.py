@@ -4,7 +4,7 @@ import whisper
 import os
 import glob
 
-st.title("🎬 AI Highlight Finder")
+st.title("AI Highlight Finder")
 
 # Fungsi Downloader yang lebih fleksibel
 def download_audio(url):
@@ -13,14 +13,13 @@ def download_audio(url):
         os.remove(f)
         
     ydl_opts = {
-        # Kita buat pencarian format berlapis: 
-        # Cari m4a murni -> Jika tidak ada cari audio terbaik -> Jika tidak ada, ambil format apa saja yang tersedia (best)
-        'format': 'm4a/bestaudio/best', 
-        
+        # 'best' akan memaksa yt-dlp mengambil file audio/video utuh apa saja yang ada
+        'format': 'best', 
         'outtmpl': 'temp.%(ext)s',
         'cookiefile': 'cookies.txt', 
-        'extractor_args': {'youtube': {'player_client': ['android']}}, 
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'quiet': True,
+        'no_warnings': True,
     }
     
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
