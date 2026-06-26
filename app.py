@@ -14,7 +14,11 @@ def download_audio(url):
         
     ydl_opts = {
         'format': 'bestaudio/best',
-        'outtmpl': 'temp.%(ext)s', # Biarkan yt-dlp menentukan ekstensi sendiri
+        'outtmpl': 'temp.%(ext)s',
+        'quiet': True,
+        'no_warnings': True,
+        # Ini trik utamanya: menyamar sebagai aplikasi YouTube Android
+        'extractor_args': {'youtube': {'player_client': ['android']}}, 
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     }
     
