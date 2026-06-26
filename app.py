@@ -13,12 +13,13 @@ def download_audio(url):
         os.remove(f)
         
     ydl_opts = {
-        'format': 'bestaudio/best',
+        # Kita buat pencarian format berlapis: 
+        # Cari m4a murni -> Jika tidak ada cari audio terbaik -> Jika tidak ada, ambil format apa saja yang tersedia (best)
+        'format': 'm4a/bestaudio/best', 
+        
         'outtmpl': 'temp.%(ext)s',
-        # --- TAMBAHKAN DUA BARIS INI ---
         'cookiefile': 'cookies.txt', 
         'extractor_args': {'youtube': {'player_client': ['android']}}, 
-        # -------------------------------
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     }
     
