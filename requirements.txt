@@ -4,4 +4,3 @@ openai-whisper
 librosa
 numpy
 torch
-scikit-learn
