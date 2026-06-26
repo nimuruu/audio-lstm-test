@@ -13,13 +13,12 @@ def download_audio(url):
         os.remove(f)
         
     ydl_opts = {
-        # 'bestaudio' akan mengambil file audio terpisah. 
-        # Jika YouTube memaksa, '/best' akan menjadi cadangannya.
-        'format': 'bestaudio/best', 
+        # Parameter 'format' KITA HAPUS TOTAL.
+        # Biarkan yt-dlp otomatis memilih apa yang menurutnya paling benar.
         'outtmpl': 'temp.%(ext)s',
-        'cookiefile': 'cookies.txt', 
+        'cookiefile': 'cookies.txt',
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'quiet': False, # Ubah ke False agar jika ada error, log di Streamlit lebih detail
+        'quiet': False,
     }
     
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
