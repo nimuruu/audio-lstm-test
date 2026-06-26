@@ -1,28 +1,31 @@
 import streamlit as st
 import yt_dlp
 import whisper
-import librosa
 import os
+import glob
 
-st.title("AI Highlight Finder")
+st.title("🎬 AI Highlight Finder")
 
-# Fungsi Downloader dengan User-Agent yang lebih stabil
+# Fungsi Downloader yang lebih fleksibel
 def download_audio(url):
-    # Bersihkan file temp lama jika ada
-    if os.path.exists("temp.mp3"):
-        os.remove("temp.mp3")
+    # Hapus file sisa (mp3, m4a, webm) agar tidak bingung
+    for f in glob.glob("temp.*"):
+        os.remove(f)
         
     ydl_opts = {
         'format': 'bestaudio/best',
-        'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3', 'preferredquality': '192'}],
-        'outtmpl': 'temp.mp3',
+        'outtmpl': 'temp.%(ext)s', # Biarkan yt-dlp menentukan ekstensi sendiri
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'no_warnings': True,
-        'ignoreerrors': True,
     }
+    
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
-    return "temp.mp3"
+    
+    # Cari file apa pun yang berawalan 'temp.'
+    files = glob.glob("temp.*")
+    if not files:
+        raise FileNotFoundError("Gagal mengunduh audio.")
+    return files[0] # Mengembalikan file pertama yang ditemukan
 
 # Interface
 url = st.text_input("Paste Link VOD (YouTube):")
@@ -32,21 +35,20 @@ if st.button("Analisis"):
         st.warning("Tolong masukkan link terlebih dahulu!")
     else:
         try:
-            with st.spinner("Sedang mengunduh audio..."):
+            with st.spinner("Mengunduh..."):
                 audio_path = download_audio(url)
             
-            with st.spinner("Sedang mentranskrip (menunggu AI bekerja)..."):
-                # Load model
+            with st.spinner("Mentranskrip..."):
+                # Whisper bisa baca m4a, webm, mp3 tanpa masalah
                 model = whisper.load_model("base")
                 result = model.transcribe(audio_path)
                 
             st.success("Analisis Selesai!")
             
-            # Tampilkan hasil
-            st.write("### Highlight yang ditemukan:")
+            st.write("### Daftar Highlight:")
             keywords = ["gila", "mantap", "kena", "win", "kill", "gg", "epic"]
-            
             found = False
+            
             for segment in result['segments']:
                 text = segment['text'].lower()
                 if any(word in text for word in keywords):
@@ -56,8 +58,7 @@ if st.button("Analisis"):
                     st.video(url, start_time=start_time)
             
             if not found:
-                st.info("Tidak ditemukan momen highlight berdasarkan keyword. Coba video lain!")
+                st.info("Tidak ditemukan momen dengan keyword tersebut.")
                 
         except Exception as e:
-            st.error(f"Terjadi kesalahan saat memproses video: {e}")
-            st.write("Tips: Pastikan link tidak privat dan server memiliki akses ke video tersebut.")
+            st.error(f"Error: {e}")
